@@ -1,26 +1,34 @@
-import { useLoaderData, Link } from "react-router";
+import { Link, Outlet } from "react-router";
 
 function App() {
-  const sampleObject = useLoaderData();
-
   return (
-    <div className="App">
-      <h1 className="text-4xl text-center font-bold py-4">
-        Met Museum Object Viewer
-      </h1>
-      <p className="text-center text-lg">
-        Explore the vast collection of the{" "}
-        <Link to="https://www.metmuseum.org/" target="_blank">
-          Metropolitan Museum of Art
-        </Link>{" "}
-        by visiting the <Link to="/gallery">Gallery</Link> or by searching for
-        specific works like the{" "}
-        <Link to={`/object/${sampleObject.objectID}`}>
-          {sampleObject.title}
-        </Link>
-        .
-      </p>
-    </div>
+    <>
+      <div className="Navbar bg-gray-800 text-white p-4">
+        <nav className="flex justify-between items-center max-w-6xl mx-auto">
+          <Link to="/" className="text-2xl font-bold">
+            Meet The Met
+          </Link>
+          <div className="space-x-4">
+            <Link to="/gallery" className="hover:underline">
+              Gallery
+            </Link>
+            <Link to="/object" className="hover:underline">
+              Object Details
+            </Link>
+            <Link
+              to="https://www.metmuseum.org/"
+              target="_blank"
+              className="hover:underline"
+            >
+              Met Museum
+            </Link>
+          </div>
+        </nav>
+      </div>
+      <div className="App max-w-6xl mx-auto p-4">
+        <Outlet />
+      </div>
+    </>
   );
 }
 

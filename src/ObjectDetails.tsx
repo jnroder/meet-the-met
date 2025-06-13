@@ -21,9 +21,7 @@ function ObjectDetails() {
 
   return (
     <div className="object-details max-w-4xl mx-auto p-4">
-      <h1 className="text-4xl text-center font-bold py-4">
-        Met Museum Object Viewer
-      </h1>
+      <h2 className="text-3xl text-center font-bold py-4">Detail View</h2>
 
       <hr className="my-4" />
 
