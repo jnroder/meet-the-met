@@ -1,25 +1,33 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { getObjectList, getObjectById } from "./lib/metmuseum";
 import "./index.css";
 import App from "./App.tsx";
+import ObjectDetails from "./ObjectDetails.tsx";
 import Gallery from "./Gallery.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    loader: async () => {
+      const objectList = await getObjectList();
+      const initialObjectId =
+        objectList.objectIDs[Math.floor(Math.random() * objectList.total)];
+      return getObjectById(initialObjectId);
+    },
+    Component: App,
   },
   {
     path: "/object/:id",
-    element: <App />,
     loader: async ({ params }) => {
-      const objectId = params.id ? parseInt(params.id, 10) : null;
-      if (objectId) {
-        const { getObjectById } = await import("./lib/metmuseum");
-        return getObjectById(objectId);
+      const objectId = Number(params.id);
+      if (isNaN(objectId) || objectId <= 0) {
+        throw new Error("Invalid Object ID");
       }
+      return getObjectById(objectId);
     },
+    Component: ObjectDetails,
   },
   {
     path: "/gallery",

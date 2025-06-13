@@ -1,3 +1,8 @@
+interface MetMuseumObjectsList {
+  total: number;
+  objectIDs: number[];
+}
+
 interface Constituent {
   constituentID: number;
   role: string;
@@ -85,6 +90,7 @@ interface MetMuseumObject {
 }
 
 export type {
+  MetMuseumObjectsList,
   Constituent,
   ElementMeasurements,
   Measurement,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { getObjectById } from "./lib/metmuseum";
+import { getObjectById, getObjectList } from "./lib/metmuseum";
 import type { MetMuseumObject } from "./types/metObjectTypes";
 
 interface GalleryProps {
@@ -14,11 +14,16 @@ const Gallery = ({ pageSize = 12, initialStartIndex = 1 }: GalleryProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const objectList = await getObjectList(); // this will usually be cached in localStorage
       const promises = [];
 
-      // create promises for all object IDs in the range
-      for (let i = startIndex; i < startIndex + pageSize; i++) {
-        promises.push(getObjectById(i));
+      for (
+        let i = startIndex;
+        i < objectList.total && promises.length < pageSize; // ensure we don't exceed pageSize or the total number of objects from the API
+        i++
+      ) {
+        const objectId = objectList.objectIDs[i - 1]; // object IDs from the API aren't exactly sequential, so we need to get them from its manifest (objectList) by index
+        promises.push(getObjectById(objectId));
       }
 
       // wait for all promises to resolve
@@ -30,34 +35,46 @@ const Gallery = ({ pageSize = 12, initialStartIndex = 1 }: GalleryProps) => {
   }, [startIndex, pageSize]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4">
       <h1 className="text-4xl text-center font-bold py-4">
         Met Museum Object Gallery
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {objects.map((object) => (
-          <div key={object.objectID} className="border p-4 rounded">
-            <Link to={`/object/${object.objectID}`}>
+          <div
+            key={object.objectID}
+            className="flex flex-col justify-between border rounded"
+          >
+            {object.primaryImage ? (
+              <img
+                src={object.primaryImage}
+                alt={object.title}
+                className="w-full h-auto mb-2"
+              />
+            ) : (
+              <div className="bg-gray-200 h-48 flex items-center justify-center mb-2">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
+            )}
+            <Link to={`/object/${object.objectID}`} className="mb-4">
               <h3 className="text-xl font-semibold">{object.title}</h3>
+            </Link>
+            <div>
               <p>Artist: {object.artistDisplayName || "unknown"}</p>
               <p>Department: {object.department}</p>
               <p>Date: {object.objectDate}</p>
-            </Link>
+            </div>
           </div>
         ))}
       </div>
       <div className="flex justify-between mt-4">
         <button
           onClick={() => setStartIndex((prev) => Math.max(prev - pageSize, 1))}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
           disabled={startIndex === 1}
         >
           Previous
         </button>
-        <button
-          onClick={() => setStartIndex((prev) => prev + pageSize)}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
+        <button onClick={() => setStartIndex((prev) => prev + pageSize)}>
           Next
         </button>
       </div>
