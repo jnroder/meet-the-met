@@ -11,7 +11,6 @@ interface GalleryProps {
 const Gallery = ({ pageSize = 12, initialStartIndex = 1 }: GalleryProps) => {
   const [objects, setObjects] = useState<MetMuseumObject[]>([]);
   const [startIndex, setStartIndex] = useState(initialStartIndex);
-  const [department, setDepartment] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
